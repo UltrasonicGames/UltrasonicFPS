@@ -14,10 +14,10 @@ ground = Entity(
     collider='box'
 )
 # Create some walls
-wall1 = Entity(model='cube', scale=(1,3,100), position=(-50,1,0), texture='brick', collider='box')
-wall2 = Entity(model='cube', scale=(1,3,100), position=(50,1,0), texture='brick', collider='box')
-wall3 = Entity(model='cube', scale=(100,3,1), position=(0,1,-50), texture='brick', collider='box')
-wall4 = Entity(model='cube', scale=(100,3,1), position=(0,1,50), texture='brick', collider='box')
+wall1 = Entity(model='cube', scale=(1,10,100), position=(-50,1,0), texture='brick', collider='box')
+wall2 = Entity(model='cube', scale=(1,10,100), position=(50,1,0), texture='brick', collider='box')
+wall3 = Entity(model='cube', scale=(100,10,1), position=(0,1,-50), texture='brick', collider='box')
+wall4 = Entity(model='cube', scale=(100,10,1), position=(0,1,50), texture='brick', collider='box')
 # create a player entity with a weapon
 player = FirstPersonController(
     position=(0, 1, 0),
@@ -39,7 +39,8 @@ player = FirstPersonController(
 # left_threshold = 30
 # right_threshold = 30
 
-threshold = 30
+threshold = 50
+maxx = 120
 
 
 def update():
@@ -47,28 +48,32 @@ def update():
         sensor_data = ser.readline().decode().strip().split(',')
         distance_front_back = int(sensor_data[0])
         distance_left_right = int(sensor_data[1])
-        player.x += 0
-        player.z += 0
+        # player.x += 0
+        # player.z += 0
         # Calculate movement based on sensor data
-        # if distance_front_back == 0 and distance_left_right == 0:
-        #     x_movement = 0.0
-        #     z_movement = 0.0
-            
-        
-        if distance_front_back < threshold:
+        x_movement = 0
+        z_movement = 0
+        if distance_front_back == 0 and distance_left_right == 0:
             x_movement = 0
-            z_movement = 1
-        elif distance_front_back > threshold:
-            x_movement = 0
-            z_movement = -1
+            z_movement = 0
             
-        elif distance_left_right < threshold:
-            x_movement += -1
-        elif distance_left_right > threshold:
-            x_movement += 1
         else:
-            x_movement = 0.0
-            z_movement = 0.0
+            
+            if distance_front_back < threshold and distance_front_back < maxx:
+                z_movement = 0.1
+            
+            elif distance_front_back > threshold and distance_front_back < maxx:
+                z_movement = -0.1
+            
+            elif distance_left_right < threshold and distance_left_right < maxx:
+                x_movement = -0.1
+
+            elif distance_left_right > threshold and distance_left_right < maxx:
+                x_movement = 0.1
+
+            else:
+                x_movement = 0
+                z_movement = 0
             
         # Limit movement to avoid excessive speed
         # x_movement = max(min(x_movement, 0.1), -0.1)
